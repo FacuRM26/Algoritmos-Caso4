@@ -72,6 +72,21 @@ public:
     pair<int, int> getUpRight(){
         return this->upRight;
     }
+    void setDownLeft(pair<int, int> leftdown){
+        if (leftdown.first<1 )
+            leftdown.first=0;
+        if (leftdown.second<1)
+            leftdown.second=0;
+
+        this->downLeft= leftdown;
+    }
+    void setUpRight(pair<int, int> rightUp){
+        if (rightUp.first<1 )
+            rightUp.first=0;
+        if (rightUp.second<1)
+            rightUp.second=0;
+        this->upRight=rightUp;
+    }
 
     void verifyRange(int red, int green, int blue) {
         for (Range* range : ranges) {
