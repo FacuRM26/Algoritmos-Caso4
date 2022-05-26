@@ -7,36 +7,52 @@
 
 #include "genetic/probabilist.hpp"
 
-
-int main() {
+int main()
+{
     // Load Image Section
     int width, height, channels;
     unsigned char *image = stbi_load("images/cara2.jpg", &width, &height, &channels, 0);
-    
+
     size_t imageSize = width * height * channels;
     int area = width * height;
-    
-    if (image != NULL) {
+
+    if (image != NULL)
+    {
         cout << "Image loaded successfully" << endl;
         cout << "Width: " << width << endl;
         cout << "Height: " << height << endl;
         cout << "Channels: " << channels << endl;
         cout << "Image size: " << imageSize << endl;
     }
-    else {
+    else
+    {
         cout << "Image not loaded" << endl;
         exit(1);
     }
-    Probabilist proba;
+    Probabilist proba(width, height, 100, 200000, 20);
+    vector<Quadrant *> prueba = proba.getQuadrants();
+    for (int i = 0; i < prueba.size(); i++)
+    {
+        Quadrant *nuevo = prueba[i];
+        cout << "Quadrant " << i << endl;
+        cout << nuevo->getDownLeft().first << " " << nuevo->getDownLeft().second << endl;
+        cout << nuevo->getUpRight().first << " " << nuevo->getUpRight().second << endl;
+        cout << nuevo->getMinProbability() << endl;
+        cout << nuevo->getMaxProbability() << endl
+             << endl;
+    }
 
-
-
-    vector<cromosomeDistribution> prueba = Genetic.getRepresentation();
-    for (auto i : prueba) {
-        cout << "Quadrant " << &i << endl;
-        cout << i.areaQuadrant << endl;
-        cout << i.minProbability << endl;
-        cout << i.maxProbability << endl << endl;
+    proba.sample(image);
+    prueba = proba.getQuadrants();
+    for (int i = 0; i < prueba.size(); i++)
+    {
+        Quadrant *nuevo = prueba[i];
+        cout << "Quadrant " << i << endl;
+        cout << nuevo->getDownLeft().first << " " << nuevo->getDownLeft().second << endl;
+        cout << nuevo->getUpRight().first << " " << nuevo->getUpRight().second << endl;
+        cout << nuevo->getMinProbability() << endl;
+        cout << nuevo->getMaxProbability() << endl
+             << endl;
     }
 
     stbi_image_free(image);

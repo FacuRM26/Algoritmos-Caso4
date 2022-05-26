@@ -107,6 +107,7 @@ public:
     vector<Quadrant*> getPopulation() {
         return population;
     }
+
 };
 
 
