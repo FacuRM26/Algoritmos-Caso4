@@ -12,6 +12,7 @@
 
 int main() {
 
+    // Socket Initialization
     socketclient client;
     client.init();
     client.clear();
@@ -24,49 +25,38 @@ int main() {
     size_t imageSize = width * height * channels;
     int area = width * height;
 
-    if (image != NULL)
-    {
+    if (image != NULL) {
         cout << "Image loaded successfully" << endl;
         cout << "Width: " << width << endl;
         cout << "Height: " << height << endl;
         cout << "Channels: " << channels << endl;
         cout << "Image size: " << imageSize << endl;
     }
-    else
-    {
+    else {
         cout << "Image not loaded" << endl;
         exit(1);
     }
 
-    Probabilist proba(width, height, 500, 400000, 20, image);
-    proba.sample();
+    // Set the probabilistic chart
+    Probabilist probabilist(width, height, 500, 400000, 20, image);
+    probabilist.sample();
     
-    vector<Quadrant *> prueba = proba.getQuadrants();
+    vector<Quadrant *> quadrantsSelected = probabilist.getQuadrants();
 
-    // for (Quadrant* i : prueba) {
-    //     cout << i->getGray() << endl;
-    // }
-
-
+    // Start the genetic
     geneticBase Genetic(width, height);
-    Genetic.addDistribution(prueba);
+    Genetic.addDistribution(quadrantsSelected);
     Genetic.initPopulation(500);
-
-
     Genetic.produceGeneration(10, 700);
 
-    // vector<Quadrant*> qua = Genetic.getRepresentation();
-    // for (Quadrant* i : qua) {
-    //     client.paintLine(255, 15, 15, 255, i->getDownLeft().first, i->getDownLeft().second,
-    //         i->getUpRight().first, i->getUpRight().second);
-    // }
-
+    // Paint the points into the screen
     vector<Point*> pop = Genetic.getPopulation();
     for (Point* i : pop) {
         client.paintDot(i->getGreyTone()*25,i->getGreyTone()*25,i->getGreyTone()*25,255,
             i->getX(), i->getY(), rand() % 10);
     }
 
+    // Free the socket and the image
     client.closeConnection();
     stbi_image_free(image);
     return 0;

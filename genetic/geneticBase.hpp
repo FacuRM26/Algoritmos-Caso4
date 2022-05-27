@@ -42,16 +42,13 @@ private:
     void evaluateFitness() {
         fitnessPopulation.clear();
 
-
         // Get the 'bounderies' of the gray tones
         vector<int> bounderies = calculateGray();
         int total = accumulate(bounderies.begin(), bounderies.end(), 0) / bounderies.size();
 
         // Set the fitness value
-        for (int i = 0; i < population.size(); i++) {
+        for (int i = 0; i < population.size(); i++)
             fitness(i, bounderies, total);
-        }
-
 
         // Get the better individuals
         float Selection_percentage = 0.4;
@@ -59,29 +56,29 @@ private:
 
         fitnessPopulation.push_back(population[0]);
 
-        int menorValor = population[0]->getFitness();
+        int currentValue = population[0]->getFitness();
         int index = 0;
 
         for (int i = 1; i < population.size(); i++) {
 
             Point* currentPoint = population[i];
 
-            // Si el vector no tiene la cantidad minima(el tanto %)
+            // If the vector does not have the max quantity of points
             if (fitnessPopulation.size() + 1 < maxQuantity) {
                 fitnessPopulation.push_back(currentPoint);
 
-                if (currentPoint->getFitness() < menorValor) {
-                    menorValor = currentPoint->getFitness();
+                if (currentPoint->getFitness() < currentValue) {
+                    currentValue = currentPoint->getFitness();
                     index = i;
                 }
                 continue;
             }
 
-            // Si el vector ya esta lleno
-            if (currentPoint->getFitness() > menorValor) {
+            // If vector has reached the max quantity, delete the less fitness
+            if (currentPoint->getFitness() > currentValue) {
                 fitnessPopulation.erase(fitnessPopulation.begin() + index);
                 fitnessPopulation.push_back(currentPoint);
-                getMinimumFitness(&menorValor, &index);
+                getMinimumFitness(&currentValue, &index);
             }
         }
     }
@@ -102,28 +99,18 @@ private:
 
     Point* cross(Point* parent_a, Point* parent_b) {
 
-        // cout << "Padre A:\n";
-        // cout << parent_a->getX() << endl;
-        // cout << parent_a->getY() << endl;
-        // cout << "Padre B:\n";
-        // cout << parent_b->getX() << endl;
-        // cout << parent_b->getY() << endl;
+        const int NIBBLE_MAX_DEFINITION = 11;
+        int cut_position = (rand() % (NIBBLE_MAX_DEFINITION - MIN_GENOTYPE_SIZE_BY_PARENT*2)) + MIN_GENOTYPE_SIZE_BY_PARENT;
 
-        int cut_position = (rand() % (11-MIN_GENOTYPE_SIZE_BY_PARENT*2)) + MIN_GENOTYPE_SIZE_BY_PARENT;
-
+        // Set the first 11 bits in 1
         unsigned int mask_a = 2047;
         mask_a <<= cut_position;
 
         unsigned int mask_b = 2047;
-        mask_b >>= 11 - cut_position;
+        mask_b >>= NIBBLE_MAX_DEFINITION - cut_position;
 
         unsigned int kidPositionX = (parent_a->getX() & mask_a) | (parent_b->getX() & mask_b);
         unsigned int kidPositionY = (parent_a->getY() & mask_a) | (parent_b->getY() & mask_b);
-        // cout << "Corte:\n";
-        // cout << cut_position << endl;
-        // cout << "Hijo:\n";
-        // cout << kidPositionX << endl;
-        // cout << kidPositionY << endl << endl;
 
         Point* children = new Point(kidPositionX, kidPositionY, (rand() % 256)/25);
         return children;
@@ -135,43 +122,40 @@ public:
         this->image_Height = height;
     }
 
-    
 
     void addDistribution(vector<Quadrant*> Quadrants_Selected) {
 
-        // Seleccionar el % mayor
+        // Select the most qualified(40%)
         float Selection_percentage = 0.4;
         int maxQuantity = ((float)Quadrants_Selected.size()) * Selection_percentage;
 
         vector<Quadrant*> mostQualified = {Quadrants_Selected[0]};
 
-        int menorValor = Quadrants_Selected[0]->getTotalPoints();
+        int minorValue = Quadrants_Selected[0]->getTotalPoints();
         int index = 0;
 
         for (int i = 1; i < Quadrants_Selected.size(); i++) {
 
             Quadrant* currentQuadrant = Quadrants_Selected[i];
 
-            // Si el vector no tiene la cantidad minima(el tanto %)
             if (mostQualified.size() + 1 < maxQuantity) {
                 mostQualified.push_back(currentQuadrant);
 
-                if (currentQuadrant->getTotalPoints() < menorValor) {
-                    menorValor = currentQuadrant->getTotalPoints();
+                if (currentQuadrant->getTotalPoints() < minorValue) {
+                    minorValue = currentQuadrant->getTotalPoints();
                     index = i;
                 }
                 continue;
             }
 
-            // Si el vector ya esta lleno
-            if (currentQuadrant->getTotalPoints() > menorValor) {
+            if (currentQuadrant->getTotalPoints() > minorValue) {
                 mostQualified.erase(mostQualified.begin() + index);
                 mostQualified.push_back(currentQuadrant);
-                getMinValue(mostQualified, &menorValor, &index);
+                getMinValue(mostQualified, &minorValue, &index);
             }
         }
 
-        // Aplicarle el rango del nibble
+        // Apply the range of the nibble
         float intervalNibble = CROMO_MAX_VALUE / mostQualified.size();
         float minProbability = 0.0;
         float maxProbability = intervalNibble;
@@ -186,7 +170,7 @@ public:
             maxProbability += intervalNibble;
         }
 
-        // Setear la distribucion
+        // Setear the distribution
         representation = mostQualified;
     };
 
@@ -256,13 +240,6 @@ public:
         for (int i = 0; i < pAmountGeneration; i++) {
             evaluateFitness();
             reproduce(pAmoutChildren);
-
-            // cout << "\nGeneracion " << i << endl;
-            // for (int i = 0; i < population.size(); i++) {
-            //     cout << population[i]->getX() << endl;
-            //     cout << population[i]->getY() << endl << endl;
-            // }
-
         }
     }
 

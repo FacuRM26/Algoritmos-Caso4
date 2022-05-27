@@ -82,7 +82,6 @@ public:
             Quadrant* individual = quadrants[i];
             
             intervalProbability = individual->getPoints()/total;
-            //cout<<intervalProbability<<endl;
             maxProbability = minProbability + intervalProbability;
 
             individual->setMinProbabilty(minProbability);
@@ -103,23 +102,6 @@ public:
                 continue;
             }
             Quadrant* quadrant=quadrants[randomQuadrant];
-            //cout<<"Quadrant "<<randomQuadrant<<endl;
-
-            // Get a random point inside the cuadrant
-            // int randomX = rand() % (quadrant->getUpRight().first - quadrant->getDownLeft().first) + quadrant->getDownLeft().first;
-            // int randomY = rand() % (quadrant->getUpRight().second - quadrant->getDownLeft().second) + quadrant->getDownLeft().second;
-
-            // Get the RGB values of the pixel selected by that point
-            // size_t index = RGB * (randomY * image_Width + randomX);
-            // int red = image[index];
-            // int green = image[index + 1];
-            // int blue = image[index + 2];
-            // int gray = (0.299 * red + 0.587 * green + 0.114 * blue) / 25;
-            // Point* newPoint = new Point(randomX, randomY, gray);
-            // points.push_back(newPoint);
-            // total--;
-            // placedPoint++;
-            // quadrant->increasePoints();
             incrementQuadrant(image, quadrant);
         }
         cout<<points.size()<<endl;
@@ -138,13 +120,8 @@ public:
             int blue2 = image[index2 + 2];
             int gray2 = (0.299 * red2 + 0.587 * green2 + 0.114 * blue2) / 25;
             
-            if (quadrant->getGray() == gray2)
-            {
-                //cout<<quadrant->getArea()<<endl;
-                if (quadrant->getArea() < 6400)
-                {
-                    // cout << "Downleft " << quadrant->getDownLeft().first << ", " << quadrant->getDownLeft().second << endl;
-                    // cout << "UpRight " << quadrant->getUpRight().first << ", " << quadrant->getUpRight().second << endl;
+            if (quadrant->getGray() == gray2) {
+                if (quadrant->getArea() < 6400) {
                     if( (quadrant->getDownLeft().first == image_Width || quadrant->getDownLeft().second == image_Height || quadrant->getUpRight().first == image_Width || quadrant->getUpRight().second == image_Height)){
                         count = 10;
                     }
@@ -154,40 +131,29 @@ public:
                     }
                     else if (quadrant->getUpRight().first - middle> randomX2 & quadrant->getUpRight().second - middle> randomY2)
                     {
-                        //cout << "entro" << endl;
                         quadrant->setDownLeft(make_pair((quadrant->getDownLeft().first - 2), (quadrant->getDownLeft().second - 2)));
                     }
                     else if (quadrant->getUpRight().first - middle < randomX2 & quadrant->getUpRight().second - middle> randomY2)
                     {
-                        //cout << "entro2" << endl;
                         quadrant->setDownLeft(make_pair(quadrant->getDownLeft().first, (quadrant->getDownLeft().second - 2)));
                         quadrant->setUpRight(make_pair((quadrant->getUpRight().first + 2), quadrant->getUpRight().second));
                     }
                     else if (quadrant->getUpRight().first - middle > randomX2 & quadrant->getUpRight().second - middle < randomY2)
                     {
-                        //cout << "entro3" << endl;
                         quadrant->setDownLeft(make_pair((quadrant->getDownLeft().first - 2), quadrant->getDownLeft().second));
                         quadrant->setUpRight(make_pair(quadrant->getUpRight().first, (quadrant->getUpRight().second + 2)));
                     }
                     else if (quadrant->getUpRight().first - middle < randomX2 & quadrant->getUpRight().second - middle < randomY2)
                     {
-                        //cout << "entro4" << endl;
                         quadrant->setUpRight(make_pair(quadrant->getUpRight().first + 2, quadrant->getUpRight().second + 2));
                     }
                     count++;
-                    // Point* newPoint = new Point(randomX2, randomY2, gray2);
-                    // points.push_back(newPoint);
                     total--;
                     placedPoint++;
                     quadrant->increasePoints();
-                    // cout << "Downleft " << quadrant->getDownLeft().first << ", " << quadrant->getDownLeft().second << endl;
-                    // cout << "UpRight " << quadrant->getUpRight().first << ", " << quadrant->getUpRight().second << endl;
                 }
-                else
-                {
+                else {
                     count++;
-                    // Point* newPoint = new Point(randomX2, randomY2, gray2);
-                    // points.push_back(newPoint);
                     total--;
                     placedPoint++;
                     quadrant->increasePoints();
