@@ -10,10 +10,13 @@ struct cromosomeDistribution {
     int y1;
     int x2;
     int y2;
+    int shape;
+    int size;
+    int grayTone;
+    int quantity;
+    int totalQuantity;
     float minProbability;
     float maxProbability;
-    float areaQuadrant;
-    float totalArea;
 };
 
 

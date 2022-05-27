@@ -5,47 +5,66 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+#include "socketClient.hpp"
+
+#include "genetic/probabilist.hpp"
 #include "genetic/geneticBase.hpp"
 
 
 int main() {
+
+    socketclient client;
+    client.init();
+    client.clear();
+
+
     // Load Image Section
     int width, height, channels;
     unsigned char *image = stbi_load("images/cara2.jpg", &width, &height, &channels, 0);
-    
+
     size_t imageSize = width * height * channels;
     int area = width * height;
-    
-    if (image != NULL) {
+
+    if (image != NULL)
+    {
         cout << "Image loaded successfully" << endl;
         cout << "Width: " << width << endl;
         cout << "Height: " << height << endl;
         cout << "Channels: " << channels << endl;
         cout << "Image size: " << imageSize << endl;
     }
-    else {
+    else
+    {
         cout << "Image not loaded" << endl;
         exit(1);
     }
 
-    // Class Genetic
+    Probabilist proba(width, height, 500, 400000, 20);
+    proba.sample(image);
+    
+    vector<Quadrant *> prueba = proba.getQuadrants();
+
+
     geneticBase Genetic(width, height);
-
-    // 0. Distribution is dinamic so in every generation is updated
-
-    // 1. Initialize the population
-    Genetic.initPopulation(10);
+    Genetic.addDistribution(prueba);
+    Genetic.initPopulation(1000);
 
 
 
-    vector<cromosomeDistribution> prueba = Genetic.getRepresentation();
-    for (auto i : prueba) {
-        cout << "Quadrant " << &i << endl;
-        cout << i.areaQuadrant << endl;
-        cout << i.minProbability << endl;
-        cout << i.maxProbability << endl << endl;
+    // Genetic.produceGeneration(10, 200);
+    vector<Quadrant*> qua = Genetic.getRepresentation();
+    for (Quadrant* i : qua) {
+        client.paintLine(255, 15, 15, 255, i->getDownLeft().first, i->getDownLeft().second,
+            i->getUpRight().first, i->getUpRight().second);
     }
 
+    vector<Point*> pop = Genetic.getPopulation();
+    for (Point* i : pop) {
+        client.paintDot(i->getGreyTone(),i->getGreyTone(),i->getGreyTone(),255,
+            i->getX(), i->getY(), rand() % 10);
+    }
+
+    client.closeConnection();
     stbi_image_free(image);
     return 0;
 }
